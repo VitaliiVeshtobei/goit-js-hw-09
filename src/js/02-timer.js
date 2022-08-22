@@ -17,6 +17,8 @@ refs.btnStart.addEventListener('click', onClickBtnStart);
 refs.btnStart.disabled = true;
 
 const options = {
+  intervalId: null,
+  deltaTime: null,
   isActive: false,
   enableTime: true,
   time_24hr: true,
@@ -30,38 +32,47 @@ const options = {
     refs.btnStart.disabled = false;
     const startTime = options.defaultDate;
     const endTime = selectedDates[0];
-    const diferenceTime = endTime - startTime;
-    const time = convertMs(diferenceTime);
+    deltaTime = endTime - startTime;
+    const time = convertMs(deltaTime);
 
     updateClockFace(time);
   },
-  // startTimer() {
-  //   if (this.isActive) {
-  //     return;
-  //   }
+  startTimer() {
+    if (options.isActive) {
+      return;
+    }
 
-  //   const startTime = Date.now();
-  //   this.isActive = true;
-  //   const endTime = Date.now(selectedDates[0]);
-  //   const diferenceTime = endTime - startTime;
+    options.isActive = true;
 
-  //   console.log(this.isActive);
+    const endTimer = deltaTime + Date.now();
 
-  //   setInterval(() => {
-  //     console.log(convertMs(diferenceTime));
-  //   }, 1000);
-  // },
+    options.intervalId = setInterval(() => {
+      if (
+        refs.days.textContent === '00' &&
+        refs.hours.textContent === '00' &&
+        refs.minutes.textContent === '00' &&
+        refs.seconds.textContent === '00'
+      ) {
+        return clearInterval(options.intervalId);
+      }
+      const deltaTimer = endTimer - Date.now();
+      const timer = convertMs(deltaTimer);
+      updateClockFace(timer);
+    }, 1000);
+  },
 };
 
 flatpickr(refs.inputDataTime, options);
 
-function onClickBtnStart(evt) {}
-console.log(refs.days.textContent);
+function onClickBtnStart(evt) {
+  options.startTimer();
+}
+
 function updateClockFace({ days, hours, minutes, seconds }) {
-  refs.days.textContent = `${days}`;
-  refs.hours.textContent = `${hours}`;
-  refs.minutes.textContent = `${minutes}`;
-  refs.seconds.textContent = `${seconds}`;
+  refs.days.textContent = addLeadingZero(`${days}`);
+  refs.hours.textContent = addLeadingZero(`${hours}`);
+  refs.minutes.textContent = addLeadingZero(`${minutes}`);
+  refs.seconds.textContent = addLeadingZero(`${seconds}`);
 }
 
 function convertMs(ms) {
@@ -83,16 +94,6 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-// console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-// console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-// console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
-
-// const timer = {
-//   start() {
-//     setInterval(() => {
-//       const currentTime = Date.now();
-//       console.log(currentTime);
-//     }, 1000);
-//   },
-// };
-// timer.start();
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
