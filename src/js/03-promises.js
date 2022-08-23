@@ -39,7 +39,6 @@ function onSubmit(evt) {
       counterPosition = 0;
     }, formData.step);
   }, formData.delay);
-  // formData = {};
 }
 function onInput(evt) {
   formData[evt.target.name] = evt.target.value;
