@@ -34,7 +34,7 @@ const options = {
     refs.btnStart.disabled = false;
     const startTime = options.defaultDate;
     const endTime = selectedDates[0];
-    deltaTime = endTime - startTime;
+    options.deltaTime = endTime - startTime;
     const time = convertMs(deltaTime);
 
     updateClockFace(time);
@@ -46,7 +46,7 @@ const options = {
 
     options.isActive = true;
 
-    const endTimer = deltaTime + Date.now();
+    const endTimer = options.deltaTime + Date.now();
 
     options.intervalId = setInterval(() => {
       if (
