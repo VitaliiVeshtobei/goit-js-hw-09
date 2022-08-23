@@ -1,38 +1,45 @@
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 const refs = {
   form: document.querySelector('.form'),
   delay: document.querySelector('[name="delay"]'),
   step: document.querySelector('[name="step"]'),
   amount: document.querySelector('[name="amount"]'),
+  btn: document.querySelector('[type="submit"]'),
 };
-console.log(refs.form);
-console.log(refs.delay);
-console.log(refs.step);
-console.log(refs.amount);
+console.log(refs.btn);
 
 refs.form.addEventListener('submit', onSubmit);
 refs.form.addEventListener('input', onInput);
 
-const formData = {};
+let formData = {};
 let counterPosition = 0;
-let counterDelay = 0;
 
 function onSubmit(evt) {
   evt.preventDefault();
-  // counterDelay = Number(formData.step);
-  const intervalId = setInterval(() => {
-    if (counterPosition !== Number(formData.amount)) {
-      counterPosition += 1;
-      counterDelay += Number(formData.step);
-      return createPromise(counterPosition, formData.delay)
-        .then(({ position, delay }) => {
-          console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-        })
-        .catch(({ position, delay }) => {
-          console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-        });
-    }
-    clearInterval(intervalId);
-  }, counterDelay);
+  refs.btn.disabled = true;
+  setTimeout(() => {
+    let counterDelay = Number(formData.delay);
+    console.log(formData);
+    let intervalId = null;
+    intervalId = setInterval(() => {
+      if (counterPosition !== Number(formData.amount)) {
+        counterPosition += 1;
+        counterDelay += Number(formData.step);
+        return createPromise(counterPosition, counterDelay)
+          .then(({ position, delay }) => {
+            Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+          })
+          .catch(({ position, delay }) => {
+            Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+          });
+      }
+      clearInterval(intervalId);
+      refs.btn.disabled = false;
+      counterPosition = 0;
+    }, formData.step);
+  }, formData.delay);
+  // formData = {};
 }
 function onInput(evt) {
   formData[evt.target.name] = evt.target.value;
@@ -42,12 +49,11 @@ function onInput(evt) {
 function createPromise(position, delay) {
   return new Promise((resolve, reject) => {
     const shouldResolve = Math.random() > 0.3;
-    setTimeout(() => {
-      if (shouldResolve) {
-        resolve({ position, delay });
-      } else {
-        reject({ position, delay });
-      }
-    }, delay);
+
+    if (shouldResolve) {
+      resolve({ position, delay });
+    } else {
+      reject({ position, delay });
+    }
   });
 }
