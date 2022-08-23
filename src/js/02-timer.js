@@ -35,7 +35,7 @@ const options = {
     const startTime = options.defaultDate;
     const endTime = selectedDates[0];
     options.deltaTime = endTime - startTime;
-    const time = convertMs(deltaTime);
+    const time = convertMs(options.deltaTime);
 
     updateClockFace(time);
   },
